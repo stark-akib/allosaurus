@@ -50,6 +50,61 @@ def read_audio(filename, header_only=False, channel=0):
 
     return audio
 
+def read_audio_chunks(filename, header_only=False, channel=0, X_seconds = 5):
+    """
+    read_audio will read a raw wav and return multiple Audio object
+    :param header_only: only load header without samples
+    """
+
+    if isinstance(filename, Path):
+        filename = str(filename)
+
+    wf = wave.open(filename)
+
+
+    audio_object_list = []
+    channel_number = wf.getnchannels()
+
+    length = X_seconds
+    buffer = length * wf.getframerate()
+    
+    samples_total = wf.getnframes()
+    
+    samples_wrote = 0
+    counter = 0
+
+    x = wf.readframes(wf.getnframes())
+
+    while samples_wrote < samples_total:
+        print(samples_wrote)
+        print(buffer)
+        #check if the buffer is not exceeding total samples 
+        if buffer > (samples_total - samples_wrote):
+            
+            buffer = samples_total - samples_wrote + 3
+            print("Short Buffer" + str(buffer))
+
+        audio = Audio()
+        audio.set_header(sample_rate=wf.getframerate(), sample_size=wf.getnframes(), channel_number=1,
+                     sample_width=wf.getsampwidth())
+
+            
+        audio_bytes = np.frombuffer(x[samples_wrote:(samples_wrote+buffer)], dtype='int16')
+        if channel_number == 2:
+            audio_bytes = audio_bytes[channel::2]
+
+        audio.samples = audio_bytes
+
+        # when some utils piping to stdout, sample size might not be correct (e.g: lame --decode)
+        audio.sample_size = len(audio.samples)
+        
+        audio_object_list.append(audio)
+        samples_wrote += buffer
+
+    wf.close()
+
+    return audio_object_list
+
 
 def resample_audio(audio, target_sample_rate):
     """
