@@ -75,3 +75,33 @@ class Recognizer:
 
         token = self.lm.compute(batch_lprobs[0], lang_id, topk)
         return token
+    
+    
+    def recognize_chunks(self, filename, lang_id='ipa', topk=1, X_length = 5):
+        # recognize a single file
+
+        assert str(filename).endswith('.wav'), "only wave file is supported in allosaurus"
+
+        # load wav audio
+        test_audio_objects = read_audio_chunks(filename, X_length)
+
+        for audio_chunks in test_audio_objects:
+
+            # extract feature
+            feat = self.pm.compute(audio_chunks)
+
+            # add batch dim
+            feats = np.expand_dims(feat, 0)
+            feat_len = np.array([feat.shape[0]], dtype=np.int32)
+
+            tensor_batch_feat, tensor_batch_feat_len = move_to_tensor([feats, feat_len], self.config.device_id)
+
+            tensor_batch_lprobs = self.am(tensor_batch_feat, tensor_batch_feat_len)
+
+            if self.config.device_id >= 0:
+                batch_lprobs = tensor_batch_lprobs.cpu().detach().numpy()
+            else:
+                batch_lprobs = tensor_batch_lprobs.detach().numpy()
+
+            token = self.lm.compute(batch_lprobs[0], lang_id, topk)
+            print(token)
