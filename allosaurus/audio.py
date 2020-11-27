@@ -50,7 +50,7 @@ def read_audio(filename, header_only=False, channel=0):
 
     return audio
 
-def read_audio_chunks(filename, header_only=False, channel=0, X_seconds = 5):
+def read_audio_chunks(filename, X_seconds, header_only=False, channel=0):
     """
     read_audio will read a raw wav and return multiple Audio object
     :param header_only: only load header without samples
@@ -61,44 +61,51 @@ def read_audio_chunks(filename, header_only=False, channel=0, X_seconds = 5):
 
     wf = wave.open(filename)
 
-
-    audio_object_list = []
-    channel_number = wf.getnchannels()
-
-    length = X_seconds
-    buffer = length * wf.getframerate()
-    
-    samples_total = wf.getnframes()
-    
     samples_wrote = 0
     counter = 0
 
-    x = wf.readframes(wf.getnframes())
+    length = int(X_seconds*4)
+    buffer = length * wf.getframerate()
+    print(buffer)
+
+    audio_object_list = []
+    channel_number = wf.getnchannels()
+    
+    x = wf.readframes(wf.getnframes()*channel_number)
+
+    #samples_total = wf.getnframes()*channel_number
+    samples_total = len(x)
+    print(samples_total)
 
     while samples_wrote < samples_total:
-        print(samples_wrote)
-        print(buffer)
+        
         #check if the buffer is not exceeding total samples 
         if buffer > (samples_total - samples_wrote):
             
-            buffer = samples_total - samples_wrote + 3
+            buffer = samples_total - samples_wrote #Gotta fix this to make it divisable by 4
             print("Short Buffer" + str(buffer))
 
         audio = Audio()
         audio.set_header(sample_rate=wf.getframerate(), sample_size=wf.getnframes(), channel_number=1,
                      sample_width=wf.getsampwidth())
 
+        if not header_only:
             
-        audio_bytes = np.frombuffer(x[samples_wrote:(samples_wrote+buffer)], dtype='int16')
-        if channel_number == 2:
-            audio_bytes = audio_bytes[channel::2]
 
-        audio.samples = audio_bytes
+            
+            print("Sample wrote: Begining " + str(samples_wrote))
+            print("After Buffer: Ending " + str(buffer+samples_wrote))    
+            audio_bytes = np.frombuffer(x[samples_wrote:(samples_wrote+buffer)], dtype='int16')
 
-        # when some utils piping to stdout, sample size might not be correct (e.g: lame --decode)
-        audio.sample_size = len(audio.samples)
-        
-        audio_object_list.append(audio)
+            if channel_number == 2:
+                audio_bytes = audio_bytes[0::2]
+
+            audio.samples = audio_bytes
+
+            # when some utils piping to stdout, sample size might not be correct (e.g: lame --decode)
+            audio.sample_size = len(audio.samples)
+            
+            audio_object_list.append(audio)
         samples_wrote += buffer
 
     wf.close()
