@@ -1,6 +1,7 @@
 from allosaurus.am.utils import *
 from pathlib import Path
 from allosaurus.audio import read_audio
+from allosaurus.audio import read_audio_chunks
 from allosaurus.pm.factory import read_pm
 from allosaurus.am.factory import read_am
 from allosaurus.lm.factory import read_lm
