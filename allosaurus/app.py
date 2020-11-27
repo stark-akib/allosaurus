@@ -87,7 +87,8 @@ class Recognizer:
         test_audio_objects = read_audio_chunks(filename, X_length)
 
         for audio_chunks in test_audio_objects:
-
+            
+            print("I'm processing audio chunks objects here.")
             # extract feature
             feat = self.pm.compute(audio_chunks)
 
