@@ -64,9 +64,9 @@ def read_audio_chunks(filename, X_seconds, header_only=False, channel=0):
     samples_wrote = 0
     counter = 0
 
-    length = int(X_seconds*4)
+    length = int(X_seconds*4) #To calculate the chunk length
     buffer = length * wf.getframerate()
-    print(buffer)
+    #print(buffer)
 
     audio_object_list = []
     channel_number = wf.getnchannels()
@@ -75,15 +75,15 @@ def read_audio_chunks(filename, X_seconds, header_only=False, channel=0):
 
     #samples_total = wf.getnframes()*channel_number
     samples_total = len(x)
-    print(samples_total)
+    #print(samples_total)
 
     while samples_wrote < samples_total:
         
         #check if the buffer is not exceeding total samples 
         if buffer > (samples_total - samples_wrote):
             
-            buffer = samples_total - samples_wrote #Gotta fix this to make it divisable by 4
-            print("Short Buffer" + str(buffer))
+            buffer = samples_total - samples_wrote 
+            #print("Short Buffer" + str(buffer))
 
         audio = Audio()
         audio.set_header(sample_rate=wf.getframerate(), sample_size=wf.getnframes(), channel_number=1,
@@ -93,8 +93,8 @@ def read_audio_chunks(filename, X_seconds, header_only=False, channel=0):
             
 
             
-            print("Sample wrote: Begining " + str(samples_wrote))
-            print("After Buffer: Ending " + str(buffer+samples_wrote))    
+            #print("Sample wrote: Begining " + str(samples_wrote))
+            #print("After Buffer: Ending " + str(buffer+samples_wrote))    
             audio_bytes = np.frombuffer(x[samples_wrote:(samples_wrote+buffer)], dtype='int16')
 
             if channel_number == 2:
