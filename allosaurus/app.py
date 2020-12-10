@@ -85,7 +85,7 @@ class Recognizer:
 
         # load wav audio
         test_audio_objects = read_audio_chunks(filename, X_length)
-        print("Processing audio chunks ....")
+        #print("Processing audio chunks ....")
         
         token_lengths = []
         
