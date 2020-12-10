@@ -86,7 +86,9 @@ class Recognizer:
         # load wav audio
         test_audio_objects = read_audio_chunks(filename, X_length)
         print("Processing audio chunks ....")
-
+        
+        token_lengths = []
+        
         for audio_chunks in test_audio_objects:
             
             
@@ -107,5 +109,5 @@ class Recognizer:
                 batch_lprobs = tensor_batch_lprobs.detach().numpy()
 
             token = self.lm.compute(batch_lprobs[0], lang_id, topk)
-            Speech_rate = len(token)/X_length
-            print("Speech rate: {} Phonemes/Sec".format( Speech_rate))
+            token_lengths.append(len(token))
+        return token_lengths
