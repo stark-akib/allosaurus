@@ -73,12 +73,13 @@ def read_audio_chunks(filename, X_seconds, header_only=False, channel=0):
     
     if(channel_number != 2):
         channel_number = 2
+        x = wf.readframes(wf.getnframes()*4)
     #Test for processing mono audio files.
     #x = wf.readframes(wf.getnframes()*2) #2 is for channel number, to process mono files.
     
+    else:
+        x = wf.readframes(wf.getnframes()*channel_number)
     
-    x = wf.readframes(wf.getnframes()*channel_number)
-
     #samples_total = wf.getnframes()*channel_number
     samples_total = len(x)
     #print(samples_total)
