@@ -65,9 +65,9 @@ def read_audio_chunks(filename, X_seconds, header_only=False, channel=0):
     counter = 0
     
     if (wf.getnchannels() != 2):
-        length = int(X_seconds*2)
+        length = int(X_seconds*2) #To calculate the buffer length for Mono Files
     else:
-        length = int(X_seconds*4) #To calculate the chunk length
+        length = int(X_seconds*4) #To calculate the buffer length for Stereo Files
     
     buffer = length * wf.getframerate()
     #print(buffer)
@@ -102,7 +102,6 @@ def read_audio_chunks(filename, X_seconds, header_only=False, channel=0):
             audio_bytes = np.frombuffer(x[samples_wrote:(samples_wrote+buffer)], dtype='int16')
 
             if channel_number == 2:
-                print("I'm Here in channel_2")
                 audio_bytes = audio_bytes[0::2]
 
             audio.samples = audio_bytes
