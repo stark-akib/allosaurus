@@ -104,6 +104,7 @@ def read_audio_chunks(filename, X_seconds, header_only=False, channel=0):
             audio_bytes = np.frombuffer(x[samples_wrote:(samples_wrote+buffer)], dtype='int16')
 
             if channel_number == 2:
+                print("I'm Here in channel_2")
                 audio_bytes = audio_bytes[0::2]
 
             audio.samples = audio_bytes
